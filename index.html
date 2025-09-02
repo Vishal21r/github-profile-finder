@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Mono', monospace;
+            background: #141d2f;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        /* Search bar styles */
+        .search-box {
+            background: #1e2a47;
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 16px;
+            padding: 0 10px;
+        }
+
+        .search-box button {
+            background: #0079ff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        
+        .search-box button:hover {
+            background: #60abff;
+        }
+        
+        #error-message {
+            color: #f74646;
+            text-align: center;
+            margin-bottom: 1rem;
+            min-height: 20px;
+        }
+
+        /* Profile card styles */
+        .profile-card {
+            background: #1e2a47;
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .profile-card .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+
+        .profile-info {
+            width: 100%;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .profile-header .username {
+            color: #0079ff;
+        }
+
+        .profile-bio {
+            color: #c4d2ff;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            background: #141d2f;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .profile-stats h4 {
+            color: #c4d2ff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-stats p {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        @media (max-width: 650px) {
+            .profile-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-header {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="username-input" placeholder="Search GitHub username…">
+            <button id="search-btn">Search</button>
+        </div>
+        
+        <p id="error-message"></p>
+
+        <div class="profile-card" id="profile-display" style="display: none;">
+            </div>
+    </div>
+
+
+    <script>
+        const searchInput = document.getElementById('username-input');
+        const searchBtn = document.getElementById('search-btn');
+        const profileDisplay = document.getElementById('profile-display');
+        const errorMessage = document.getElementById('error-message');
+
+        const API_URL = 'https://api.github.com/users/';
+
+        // when the search button is clicked
+        searchBtn.addEventListener('click', () => {
+            const user = searchInput.value.trim();
+            if (user) {
+                getUserData(user);
+            }
+        });
+
+        // let the user press Enter to search too
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const user = searchInput.value.trim();
+                if (user) {
+                    getUserData(user);
+                }
+            }
+        });
+        
+        // this function fetches the user data from GitHub
+        async function getUserData(username) {
+            errorMessage.textContent = ''; // clear previous errors
+            
+            try {
+                const res = await fetch(API_URL + username);
+
+                if (!res.ok) {
+                    throw new Error('User not found');
+                }
+
+                const data = await res.json();
+                
+                displayProfile(data);
+                
+            } catch (err) {
+                profileDisplay.style.display = 'none'; // hide the card if user not found
+                errorMessage.textContent = 'No results, please try another username.';
+            }
+        }
+
+        function displayProfile(user) {
+            const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            // This is the HTML that will be put inside the profile card
+            const cardHTML = `
+                <img src="${user.avatar_url}" alt="User Avatar" class="avatar">
+                <div class="profile-info">
+                    <div class="profile-header">
+                        <div>
+                            <h2>${user.name || user.login}</h2>
+                            <p class="username">@${user.login}</p>
+                        </div>
+                        <p>Joined ${joinDate}</p>
+                    </div>
+
+                    <p class="profile-bio">${user.bio || 'This profile has no bio.'}</p>
+
+                    <div class="profile-stats">
+                        <div>
+                            <h4>Repos</h4>
+                            <p>${user.public_repos}</p>
+                        </div>
+                        <div>
+                            <h4>Followers</h4>
+                            <p>${user.followers}</p>
+                        </div>
+                        <div>
+                            <h4>Following</h4>
+                            <p>${user.following}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            profileDisplay.innerHTML = cardHTML;
+            profileDisplay.style.display = 'flex';
+        }
+    </script>
+
+</body>
+</html>
