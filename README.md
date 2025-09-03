@@ -29,7 +29,7 @@ This is a simple front-end project with no build steps required.
 
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/your-username/github-profile-finder.git](https://github.com/your-username/github-profile-finder.git)
+    git clone [https://github.com/Vishal21r/github-profile-finder.git](https://github.com/Vishal21r/github-profile-finder.git)
     ```
 2.  Navigate to the project directory:
     ```bash
