@@ -2,9 +2,7 @@
 
 A clean and simple web application for finding GitHub users and viewing their profile information at a glance. This project was built to demonstrate core skills in vanilla JavaScript, API integration, and modern front-end design.
 
-**➡️ Live Demo:** [https://your-username.github.io/github-profile-finder/](https://your-username.github.io/github-profile-finder/) ---
 
-![Project Screenshot](https://i.imgur.com/your-screenshot-link.png) 
 ## ## ✨ Key Features
 
 * **Dynamic User Search:** Fetches and displays user data in real-time from the official GitHub REST API.
